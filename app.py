@@ -40,6 +40,9 @@ class Venue(db.Model):
     phone = db.Column(db.String(120), nullable=False)
     image_link = db.Column(db.String(500), nullable=False)
     facebook_link = db.Column(db.String(120))
+    # inserting missing column
+    seeking_talent = db.Column(db.Boolean(), default=False)
+    seeking_description = db.Column(db.String(500))
     # create one to many relationship one venue can have many shows
     shows = db.relationship('Show')
 
@@ -56,6 +59,9 @@ class Artist(db.Model):
     genres = db.Column(db.String(120), nullable=False)
     image_link = db.Column(db.String(500), nullable=False)
     facebook_link = db.Column(db.String(120))
+    # inserting missing column
+    seeking_venue = db.Column(db.Boolean(), default=False)
+    seeking_description = db.Column(db.String(500))
 
 
     # TODO: implement any missing fields, as a database migration using Flask-Migrate
