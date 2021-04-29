@@ -63,6 +63,8 @@ class Artist(db.Model):
     genres = db.Column(db.String(120), nullable=False)
     image_link = db.Column(db.String(500), nullable=False)
     facebook_link = db.Column(db.String(120))
+    website_link = db.Column(db.String(120))
+
     # inserting missing column
     seeking_venue = db.Column(db.Boolean(), default=False)
     seeking_description = db.Column(db.String(500))
@@ -327,8 +329,15 @@ def artists():
   }]
   return render_template('pages/artists.html', artists=data)
   '''
-  return render_template('pages/artists.html',
-    artists=Artist.query.all())
+  artists = Artist.query.all()
+  data = []
+  for a in artists:
+    data.append({
+      'id': a.id,
+      'name': a.name
+      })
+  return render_template('pages/artists.html', artists=data)
+
 
 @app.route('/artists/search', methods=['POST'])
 def search_artists():
@@ -349,6 +358,7 @@ def search_artists():
 def show_artist(artist_id):
   # shows the artist page with the given artist_id
   # TODO: replace with real artist data from the artist table, using artist_id
+  '''
   data1={
     "id": 4,
     "name": "Guns N Petals",
@@ -422,6 +432,9 @@ def show_artist(artist_id):
   }
   data = list(filter(lambda d: d['id'] == artist_id, [data1, data2, data3]))[0]
   return render_template('pages/show_artist.html', artist=data)
+  '''
+  data = Artist.query.filter_by(id = artist_id).first()
+  return render_template('pages/show_artist.html', artist=data)
 
 #  Update
 #  ----------------------------------------------------------------
@@ -490,12 +503,40 @@ def create_artist_submission():
   # called upon submitting the new artist listing form
   # TODO: insert form data as a new Venue record in the db, instead
   # TODO: modify data to be the data object returned from db insertion
+  form = ArtistForm()
+  if form.validate_on_submit():
+    try:
+      new_artist = Artist(
+        name=form.name.data,
+        city=form.city.data,
+        state=form.state.data,
+        phone=form.phone.data,
+        image_link=form.image_link.data,
+        genres=form.genres.data,
+        facebook_link=form.facebook_link.data,
+        website_link=form.website_link.data,
+        seeking_venue=form.seeking_venue.data,
+        seeking_description=form.seeking_description.data
+        )
+      db.session.add(new_artist)
+      db.session.commit()
 
-  # on successful db insert, flash success
-  flash('Artist ' + request.form['name'] + ' was successfully listed!')
+      # on successful db insert, flash success
+      flash('Artist ' + form.name.data + ' was successfully listed!')
+      return redirect(url_for('show_artist', artist_id=new_artist.id))
   # TODO: on unsuccessful db insert, flash an error instead.
   # e.g., flash('An error occurred. Artist ' + data.name + ' could not be listed.')
-  return render_template('pages/home.html')
+    except:
+      db.session.rollback()
+      print(sys.exc_info())
+      flash('An error occurred. Artist ' + form.name.data + ' could not be listed.')
+    finally:
+      db.session.close()
+  else:
+    flash('An error occurred. Artist ' + form.name.data + ' could not be listed.')
+    print(form.errors)
+
+  return render_template('forms/new_artist.html', form=form)
 
 
 #  Shows
