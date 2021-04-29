@@ -112,7 +112,7 @@ def index():
 def venues():
   # TODO: replace with real venues data.
   #       num_shows should be aggregated based on number of upcoming shows per venue.
-  data=[{
+  '''data=[{
     "city": "San Francisco",
     "state": "CA",
     "venues": [{
@@ -134,6 +134,21 @@ def venues():
     }]
   }]
   return render_template('pages/venues.html', areas=data);
+  '''
+  venues=Venue.query.all()
+  areas = set()
+  data = []
+
+  for v in venues:
+    areas.add((v.city, v.state))
+  
+  for a in areas:
+    data.append({
+      'city':a[0], 
+      'state':a[1], 
+      'venues': Venue.query.filter_by(city=a[0],state=a[1]).all()
+      })
+  return render_template('pages/venues.html', areas=data,)
 
 @app.route('/venues/search', methods=['POST'])
 def search_venues():
@@ -244,8 +259,8 @@ def create_venue_form():
 
 @app.route('/venues/create', methods=['POST'])
 def create_venue_submission():
-  # TODO: insert form data as a new Venue record in the db, instead
-  # TODO: modify data to be the data object returned from db insertion
+  # insert form data as a new Venue record in the db, instead
+  # modify data to be the data object returned from db insertion
   form = VenueForm()
   if form.validate_on_submit():
     try:
@@ -269,8 +284,7 @@ def create_venue_submission():
       flash('Venue ' + form.name.data + ' was successfully listed!')
       return redirect(url_for('show_venue', venue_id=new_venue.id))
 
-  # TODO: on unsuccessful db insert, flash an error instead.
-  # e.g., flash('An error occurred. Venue ' + data.name + ' could not be listed.')
+  # on unsuccessful db insert, flash an error instead.
   # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
     except:
       db.session.rollback()
@@ -297,7 +311,7 @@ def delete_venue(venue_id):
 @app.route('/artists')
 def artists():
   # TODO: replace with real data returned from querying the database
-  data=[{
+  '''data=[{
     "id": 4,
     "name": "Guns N Petals",
   }, {
@@ -308,6 +322,9 @@ def artists():
     "name": "The Wild Sax Band",
   }]
   return render_template('pages/artists.html', artists=data)
+  '''
+  return render_template('pages/artists.html',
+    artists=Artist.query.all())
 
 @app.route('/artists/search', methods=['POST'])
 def search_artists():
