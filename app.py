@@ -6,6 +6,7 @@ import sys
 import json
 import dateutil.parser
 import babel
+from datetime import datetime
 from flask import Flask, render_template, request, Response, flash, redirect, url_for, jsonify
 from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
@@ -146,6 +147,30 @@ def search_venues():
 def show_venue(venue_id):
   
   data = Venue.query.filter_by(id = venue_id).first()
+
+  # query all the available shows 
+  shows = data.shows
+  now = datetime.now()
+  past_shows = []
+  upcoming_shows = []
+  # checking if they are past or future
+  for show in shows:
+    if show.date_time < now:
+      past_shows.append({
+        "artist_name": show.artist.name,
+        "start_time": show.date_time.isoformat()
+        })
+    else:
+      upcoming_shows.append({
+        "artist_name": show.artist.name,
+        "start_time": show.date_time.isoformat()
+        })
+
+  data.upcoming_shows = upcoming_shows
+  data.past_shows = past_shows
+  data.upcoming_shows_count = len(upcoming_shows)
+  data.past_shows_cout = len(past_shows)
+
   return render_template('pages/show_venue.html', venue=data)
 
 #  Create Venue
@@ -219,8 +244,6 @@ def delete_venue(venue_id):
   finally:
     db.session.close()
   return redirect(url_for('index'))
-
-  
 
 #  Artists
 #  ----------------------------------------------------------------
