@@ -206,6 +206,10 @@ def delete_venue(venue_id):
   
   try:
     delete_venue = Venue.query.get(venue_id)
+    # delete related shows
+    shows = Show.query.filter_by(venue_id=venue_id).all()
+    for show in shows:
+      db.session.delete(show)
     db.session.delete(delete_venue)
     db.session.commit()
     print("Venue deleted")
