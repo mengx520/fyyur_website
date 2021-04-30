@@ -412,11 +412,13 @@ def shows():
   shows = Show.query.all()
   data=[]
   for s in shows:
+    artist = Artist.query.filter_by(id=s.artist_id).first()
     data.append({
       'venue_id':s.venue_id,
       'venue_name': Venue.query.filter_by(id=s.venue_id).first().name,
       'artist_id': s.artist_id,
-      'artist_name': Artist.query.filter_by(id=s.artist_id).first().name,
+      'artist_name': artist.name,
+      'artist_image_link': artist.image_link,
       'start_time': s.date_time.isoformat()
       })
   return render_template('pages/shows.html', shows=data)
