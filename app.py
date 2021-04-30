@@ -6,7 +6,7 @@ import sys
 import json
 import dateutil.parser
 import babel
-from flask import Flask, render_template, request, Response, flash, redirect, url_for
+from flask import Flask, render_template, request, Response, flash, redirect, url_for, jsonify
 from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -86,7 +86,6 @@ def fix_genres(artist, form):
   for g in genres.split(','):
     genres_list.append(g)
   form.genres.data = genres_list
-
 
 #----------------------------------------------------------------------------#
 # Filters.
@@ -200,14 +199,27 @@ def create_venue_submission():
     print(form.errors)
   return render_template('forms/new_venue.html', form=form)
 
-@app.route('/venues/<venue_id>', methods=['DELETE'])
+@app.route('/venues/<venue_id>/delete', methods=['GET'])
 def delete_venue(venue_id):
-  # TODO: Complete this endpoint for taking a venue_id, and using
+  # Complete this endpoint for taking a venue_id, and using
   # SQLAlchemy ORM to delete a record. Handle cases where the session commit could fail.
 
   # BONUS CHALLENGE: Implement a button to delete a Venue on a Venue Page, have it so that
   # clicking that button delete it from the db then redirect the user to the homepage
-  return None
+  
+  try:
+    delete_venue = Venue.query.get(venue_id)
+    db.session.delete(delete_venue)
+    db.session.commit()
+    print("Venue deleted")
+  except:
+    db.session.rollback()
+    print("Error")
+  finally:
+    db.session.close()
+  return redirect(url_for('index'))
+
+  
 
 #  Artists
 #  ----------------------------------------------------------------
@@ -332,8 +344,8 @@ def create_artist_form():
 @app.route('/artists/create', methods=['POST'])
 def create_artist_submission():
   # called upon submitting the new artist listing form
-  # TODO: insert form data as a new Venue record in the db, instead
-  # TODO: modify data to be the data object returned from db insertion
+  # insert form data as a new Venue record in the db, instead
+  # modify data to be the data object returned from db insertion
   form = ArtistForm()
   if form.validate_on_submit():
     try:
@@ -355,7 +367,7 @@ def create_artist_submission():
       # on successful db insert, flash success
       flash('Artist ' + form.name.data + ' was successfully listed!')
       return redirect(url_for('show_artist', artist_id=new_artist.id))
-  # TODO: on unsuccessful db insert, flash an error instead.
+  # on unsuccessful db insert, flash an error instead.
   # e.g., flash('An error occurred. Artist ' + data.name + ' could not be listed.')
     except:
       db.session.rollback()
@@ -396,7 +408,7 @@ def create_shows():
 @app.route('/shows/create', methods=['POST'])
 def create_show_submission():
   # called to create new shows in the db, upon submitting new show listing form
-  # TODO: insert form data as a new Show record in the db, instead
+  # insert form data as a new Show record in the db, instead
   form = ShowForm()
   if form.validate_on_submit():
     try:
@@ -410,7 +422,7 @@ def create_show_submission():
       flash('Show was successfully listed!')
       return redirect(url_for('shows'))
 
-    # TODO: on unsuccessful db insert, flash an error instead.
+    # on unsuccessful db insert, flash an error instead.
     # e.g., flash('An error occurred. Show could not be listed.')
     # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
     except:
