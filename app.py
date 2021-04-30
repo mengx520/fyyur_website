@@ -20,7 +20,6 @@ from forms import ShowForm, VenueForm, ArtistForm
 #----------------------------------------------------------------------------#
 
 app = Flask(__name__)
-# CsrfProtect(app)
 moment = Moment(app)
 app.config.from_object('config')
 
@@ -49,7 +48,7 @@ class Venue(db.Model):
     seeking_talent = db.Column(db.Boolean(), default=False)
     seeking_description = db.Column(db.String(500))
     # create one to many relationship one venue can have many shows
-    shows = db.relationship('Show')
+    shows = db.relationship('Show', backref='venue')
 
 class Artist(db.Model):
     __tablename__ = 'artist'
@@ -63,8 +62,6 @@ class Artist(db.Model):
     image_link = db.Column(db.String(500), nullable=False)
     facebook_link = db.Column(db.String(120))
     website_link = db.Column(db.String(120))
-
-    # inserting missing column
     seeking_venue = db.Column(db.Boolean(), default=False)
     seeking_description = db.Column(db.String(500))
 
@@ -133,7 +130,7 @@ def venues():
 
 @app.route('/venues/search', methods=['POST'])
 def search_venues():
-  # TODO: implement search on artists with partial string search. Ensure it is case-insensitive.
+  # implement search on artists with partial string search. Ensure it is case-insensitive.
   # seach for Hop should return 'The Musical Hop'.
   # search for 'Music' should return 'The Musical Hop' and 'Park Square Live Music & Coffee'
   data = Venue.query.filter(Venue.name.ilike("%" + request.form.get('search_term') + "%")).all()
@@ -145,9 +142,7 @@ def search_venues():
 
 @app.route('/venues/<int:venue_id>')
 def show_venue(venue_id):
-  
   data = Venue.query.filter_by(id = venue_id).first()
-
   # query all the available shows 
   shows = data.shows
   now = datetime.now()
@@ -157,19 +152,23 @@ def show_venue(venue_id):
   for show in shows:
     if show.date_time < now:
       past_shows.append({
-        "artist_name": show.artist.name,
-        "start_time": show.date_time.isoformat()
+        'artist_id': show.artist_id,
+        'artist_image_link': show.artist.image_link,
+        'artist_name': show.artist.name,
+        'start_time': show.date_time.isoformat()
         })
     else:
       upcoming_shows.append({
-        "artist_name": show.artist.name,
-        "start_time": show.date_time.isoformat()
+        'artist_id': show.artist_id,
+        'artist_image_link': show.artist.image_link,
+        'artist_name': show.artist.name,
+        'start_time': show.date_time.isoformat()
         })
 
   data.upcoming_shows = upcoming_shows
   data.past_shows = past_shows
   data.upcoming_shows_count = len(upcoming_shows)
-  data.past_shows_cout = len(past_shows)
+  data.past_shows_count = len(past_shows)
 
   return render_template('pages/show_venue.html', venue=data)
 
@@ -269,12 +268,37 @@ def search_artists():
     'count': len(data),
     'data': data
   }
-
   return render_template('pages/search_artists.html', results=response, search_term=request.form.get('search_term', ''))
 
 @app.route('/artists/<int:artist_id>')
 def show_artist(artist_id):
   data = Artist.query.filter_by(id = artist_id).first()
+
+  shows = data.shows
+  now = datetime.now()
+  past_shows = []
+  upcoming_shows = []
+
+  for show in shows:
+    if show.date_time < now:
+      past_shows.append({
+        'venue_id': show.venue_id,
+        'venue_image_link': show.venue.image_link,
+        'venue_name': show.venue.name,
+        'start_time': show.date_time.isoformat()
+        })
+    else:
+      upcoming_shows.append({
+        'venue_id': show.venue_id,
+        'venue_image_link': show.venue.image_link,
+        'venue_name': show.venue.name,
+        'start_time': show.date_time.isoformat()
+        })
+  data.past_shows = past_shows
+  data.upcoming_shows = upcoming_shows
+  data.past_shows_count = len(past_shows)
+  data.upcoming_shows_count = len(upcoming_shows)
+
   return render_template('pages/show_artist.html', artist=data)
 
 #  Update
@@ -403,7 +427,6 @@ def create_artist_submission():
 
   return render_template('forms/new_artist.html', form=form)
 
-
 #  Shows
 #  ----------------------------------------------------------------
 
@@ -412,13 +435,12 @@ def shows():
   shows = Show.query.all()
   data=[]
   for s in shows:
-    artist = Artist.query.filter_by(id=s.artist_id).first()
     data.append({
       'venue_id':s.venue_id,
-      'venue_name': Venue.query.filter_by(id=s.venue_id).first().name,
+      'venue_name': s.venue.name,
       'artist_id': s.artist_id,
-      'artist_name': artist.name,
-      'artist_image_link': artist.image_link,
+      'artist_name': s.artist.name,
+      'artist_image_link': s.artist.image_link,
       'start_time': s.date_time.isoformat()
       })
   return render_template('pages/shows.html', shows=data)
@@ -447,8 +469,6 @@ def create_show_submission():
       return redirect(url_for('shows'))
 
     # on unsuccessful db insert, flash an error instead.
-    # e.g., flash('An error occurred. Show could not be listed.')
-    # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
     except:
       db.session.rollback()
       print(sys.exc_info())
