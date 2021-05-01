@@ -16,15 +16,18 @@ from .models import db, Venue, Artist, Show
 site = Blueprint('site', __name__)
 
 # change genres string to list
+
+
 def fix_genres(artist, form):
     genres = artist.genres
-    genres = genres.replace('{','')
+    genres = genres.replace('{', '')
     genres = genres.replace('}', '')
     genres_list = []
 
     for g in genres.split(','):
         genres_list.append(g)
     form.genres.data = genres_list
+
 
 @site.route('/')
 def index():
@@ -33,9 +36,10 @@ def index():
 #  Venues
 #  ----------------------------------------------------------------
 
+
 @site.route('/venues')
 def venues():
-    venues=Venue.query.all()
+    venues = Venue.query.all()
     areas = set()
     data = []
 
@@ -44,27 +48,30 @@ def venues():
 
     for a in areas:
         data.append({
-            'city':a[0], 
-            'state':a[1], 
-            'venues': Venue.query.filter_by(city=a[0],state=a[1]).all()
-            })
+            'city': a[0],
+            'state': a[1],
+            'venues': Venue.query.filter_by(city=a[0], state=a[1]).all()
+        })
     return render_template('pages/venues.html', areas=data)
+
 
 @site.route('/venues/search', methods=['POST'])
 def search_venues():
     # implement search on artists with partial string search. Ensure it is case-insensitive.
     # seach for Hop should return 'The Musical Hop'.
     # search for 'Music' should return 'The Musical Hop' and 'Park Square Live Music & Coffee'
-    data = Venue.query.filter(Venue.name.ilike("%" + request.form.get('search_term') + "%")).all()
-    response={
+    data = Venue.query.filter(Venue.name.ilike(
+        "%" + request.form.get('search_term') + "%")).all()
+    response = {
         'count': len(data),
         'data': data
     }
     return render_template('pages/search_venues.html', results=response, search_term=request.form.get('search_term', ''))
 
+
 @site.route('/venues/<int:venue_id>')
 def show_venue(venue_id):
-     
+
     upcoming_shows = []
     past_shows = []
     now = datetime.now()
@@ -101,10 +108,12 @@ def show_venue(venue_id):
 #  Create Venue
 #  ----------------------------------------------------------------
 
+
 @site.route('/venues/create', methods=['GET'])
 def create_venue_form():
     form = VenueForm()
     return render_template('forms/new_venue.html', form=form)
+
 
 @site.route('/venues/create', methods=['POST'])
 def create_venue_submission():
@@ -114,17 +123,17 @@ def create_venue_submission():
     if form.validate_on_submit():
         try:
             new_venue = Venue(
-            name=form.name.data,
-            city=form.city.data,
-            state=form.state.data,
-            address=form.address.data,
-            phone=form.address.data,
-            image_link=form.image_link.data,
-            genres=form.genres.data,
-            facebook_link=form.facebook_link.data,
-            website_link=form.website_link.data,
-            seeking_talent=form.seeking_talent.data,
-            seeking_description=form.seeking_description.data)
+                name=form.name.data,
+                city=form.city.data,
+                state=form.state.data,
+                address=form.address.data,
+                phone=form.address.data,
+                image_link=form.image_link.data,
+                genres=form.genres.data,
+                facebook_link=form.facebook_link.data,
+                website_link=form.website_link.data,
+                seeking_talent=form.seeking_talent.data,
+                seeking_description=form.seeking_description.data)
 
             db.session.add(new_venue)
             db.session.commit()
@@ -138,13 +147,16 @@ def create_venue_submission():
         except:
             db.session.rollback()
             print(sys.exc_info())
-            flash('An error occurred. Venue ' + form.name.data + ' could not be listed.')
+            flash('An error occurred. Venue ' +
+                  form.name.data + ' could not be listed.')
         finally:
             db.session.close()
     else:
-        flash('An error occurred. Venue ' + form.name.data + ' could not be listed.')
+        flash('An error occurred. Venue ' +
+              form.name.data + ' could not be listed.')
         print(form.errors)
     return render_template('forms/new_venue.html', form=form)
+
 
 @site.route('/venues/<venue_id>/delete', methods=['GET'])
 def delete_venue(venue_id):
@@ -171,6 +183,8 @@ def delete_venue(venue_id):
 
 #  Artists
 #  ----------------------------------------------------------------
+
+
 @site.route('/artists')
 def artists():
     artists = Artist.query.all()
@@ -179,7 +193,7 @@ def artists():
         data.append({
             'id': a.id,
             'name': a.name
-            })
+        })
     return render_template('pages/artists.html', artists=data)
 
 
@@ -188,12 +202,14 @@ def search_artists():
     # implement search on artists with partial string search. Ensure it is case-insensitive.
     # seach for 'A' should return 'Guns N Petals', 'Matt Quevado', and 'The Wild Sax Band'.
     # search for 'band' should return 'The Wild Sax Band'.
-    data = Artist.query.filter(Artist.name.ilike("%" + request.form.get('search_term') + "%")).all()
-    response={
+    data = Artist.query.filter(Artist.name.ilike(
+        "%" + request.form.get('search_term') + "%")).all()
+    response = {
         'count': len(data),
         'data': data
     }
     return render_template('pages/search_artists.html', results=response, search_term=request.form.get('search_term', ''))
+
 
 @site.route('/artists/<int:artist_id>')
 def show_artist(artist_id):
@@ -217,7 +233,7 @@ def show_artist(artist_id):
             })
         else:
             upcoming_shows.append({
-                'venue_id': s.artist_id,
+                'venue_id': s.venue_id,
                 'venue_image_link': s.image_link,
                 'venue_name': s.name,
                 'start_time': s.date_time.isoformat()
@@ -232,6 +248,8 @@ def show_artist(artist_id):
 
 #  Update
 #  ----------------------------------------------------------------
+
+
 @site.route('/artists/<int:artist_id>/edit', methods=['GET'])
 def edit_artist(artist_id):
     # populate form with fields from artist with ID <artist_id>
@@ -240,6 +258,7 @@ def edit_artist(artist_id):
     fix_genres(artist, form)
 
     return render_template('forms/edit_artist.html', form=form, artist=artist)
+
 
 @site.route('/artists/<int:artist_id>/edit', methods=['POST'])
 def edit_artist_submission(artist_id):
@@ -260,11 +279,13 @@ def edit_artist_submission(artist_id):
         except:
             db.session.rollback()
             print(sys.exc_info())
-            flash('An error occurred. Artist ' + form.name.data + ' could not be updated.')
+            flash('An error occurred. Artist ' +
+                  form.name.data + ' could not be updated.')
         finally:
             db.session.close()
     else:
-        flash('An error occurred. Artist ' + form.name.data + ' could not be updated.')
+        flash('An error occurred. Artist ' +
+              form.name.data + ' could not be updated.')
         print(form.errors)
 
     return render_template('forms/edit_artist.html', form=form, artist=artist)
@@ -278,6 +299,7 @@ def edit_venue(venue_id):
     form = VenueForm(obj=venue)
     fix_genres(venue, form)
     return render_template('forms/edit_venue.html', form=form, venue=venue)
+
 
 @site.route('/venues/<int:venue_id>/edit', methods=['POST'])
 def edit_venue_submission(venue_id):
@@ -298,11 +320,13 @@ def edit_venue_submission(venue_id):
         except:
             db.session.rollback()
             print(sys.exc_info())
-            flash('An error occurred. Venue ' + form.name.data + ' could not be updated.')
+            flash('An error occurred. Venue ' +
+                  form.name.data + ' could not be updated.')
         finally:
             db.session.close()
     else:
-        flash('An error occurred. Venue ' + form.name.data + ' could not be updated.')
+        flash('An error occurred. Venue ' +
+              form.name.data + ' could not be updated.')
         print(form.errors)
 
     return render_template('forms/edit_venue.html', form=form, venue=venue)
@@ -310,10 +334,12 @@ def edit_venue_submission(venue_id):
 #  Create Artist
 #  ----------------------------------------------------------------
 
+
 @site.route('/artists/create', methods=['GET'])
 def create_artist_form():
     form = ArtistForm()
     return render_template('forms/new_artist.html', form=form)
+
 
 @site.route('/artists/create', methods=['POST'])
 def create_artist_submission():
@@ -346,11 +372,13 @@ def create_artist_submission():
         except:
             db.session.rollback()
             print(sys.exc_info())
-            flash('An error occurred. Artist ' + form.name.data + ' could not be listed.')
+            flash('An error occurred. Artist ' +
+                  form.name.data + ' could not be listed.')
         finally:
             db.session.close()
     else:
-        flash('An error occurred. Artist ' + form.name.data + ' could not be listed.')
+        flash('An error occurred. Artist ' +
+              form.name.data + ' could not be listed.')
         print(form.errors)
 
     return render_template('forms/new_artist.html', form=form)
@@ -358,26 +386,29 @@ def create_artist_submission():
 #  Shows
 #  ----------------------------------------------------------------
 
+
 @site.route('/shows')
 def shows():
     shows = Show.query.all()
-    data=[]
+    data = []
     for s in shows:
         data.append({
-          'venue_id':s.venue_id,
-          'venue_name': s.venue.name,
-          'artist_id': s.artist_id,
-          'artist_name': s.artist.name,
-          'artist_image_link': s.artist.image_link,
-          'start_time': s.date_time.isoformat()
-          })
+            'venue_id': s.venue_id,
+            'venue_name': s.venue.name,
+            'artist_id': s.artist_id,
+            'artist_name': s.artist.name,
+            'artist_image_link': s.artist.image_link,
+            'start_time': s.date_time.isoformat()
+        })
     return render_template('pages/shows.html', shows=data)
+
 
 @site.route('/shows/create')
 def create_shows():
     # renders form. do not touch.
     form = ShowForm()
     return render_template('forms/new_show.html', form=form)
+
 
 @site.route('/shows/create', methods=['POST'])
 def create_show_submission():
@@ -387,9 +418,9 @@ def create_show_submission():
     if form.validate_on_submit():
         try:
             new_show = Show(
-            artist_id=form.artist_id.data,
-            venue_id=form.venue_id.data,
-            date_time=form.start_time.data)
+                artist_id=form.artist_id.data,
+                venue_id=form.venue_id.data,
+                date_time=form.start_time.data)
             db.session.add(new_show)
             db.session.commit()
             # on successful db insert, flash success
@@ -408,9 +439,11 @@ def create_show_submission():
         print(form.errors)
     return render_template('forms/new_show.html', form=form)
 
+
 @site.errorhandler(404)
 def not_found_error(error):
     return render_template('errors/404.html'), 404
+
 
 @site.errorhandler(500)
 def server_error(error):

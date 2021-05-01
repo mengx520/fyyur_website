@@ -9,6 +9,7 @@ migrate = Migrate()
 # Models.
 #----------------------------------------------------------------------------#
 
+
 class Venue(db.Model):
     __tablename__ = 'venue'
 
@@ -28,6 +29,7 @@ class Venue(db.Model):
     # create one to many relationship one venue can have many shows
     shows = db.relationship('Show', backref='venue')
 
+
 class Artist(db.Model):
     __tablename__ = 'artist'
 
@@ -42,7 +44,8 @@ class Artist(db.Model):
     website_link = db.Column(db.String(120))
     seeking_venue = db.Column(db.Boolean(), default=False)
     seeking_description = db.Column(db.String(500))
-    
+
+
 class Show(db.Model):
     __tablename__ = 'show'
     id = db.Column(db.Integer, primary_key=True)
