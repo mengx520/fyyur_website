@@ -23,12 +23,13 @@ def format_datetime(value, format='medium'):
 
 
 def create_app():
-    from fyyur.routes import site
-    from fyyur.models import db, migrate
+    from .routes import site
+    from .models import db, migrate
+    from .config import FyyurConfig
 
     app = Flask(__name__)
     moment = Moment(app)
-    app.config.from_object('fyyur.config')
+    app.config.from_object(FyyurConfig)
 
     db.init_app(app)
     migrate.init_app(app, db)

@@ -7,8 +7,8 @@ from datetime import datetime
 from flask import Flask, render_template, request, Response, flash, redirect, url_for, jsonify, Blueprint
 from flask_moment import Moment
 from flask_wtf import Form, CsrfProtect
-from fyyur.forms import ShowForm, VenueForm, ArtistForm
-from fyyur.models import db, Venue, Artist, Show
+from .forms import ShowForm, VenueForm, ArtistForm
+from .models import db, Venue, Artist, Show
 
 #----------------------------------------------------------------------------#
 # Controllers.
