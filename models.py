@@ -1,6 +1,9 @@
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
+
 # connect to a local postgresql database
 db = SQLAlchemy()
+migrate = Migrate()
 
 #----------------------------------------------------------------------------#
 # Models.
@@ -39,7 +42,7 @@ class Artist(db.Model):
     website_link = db.Column(db.String(120))
     seeking_venue = db.Column(db.Boolean(), default=False)
     seeking_description = db.Column(db.String(500))
-
+    
 class Show(db.Model):
     __tablename__ = 'show'
     id = db.Column(db.Integer, primary_key=True)

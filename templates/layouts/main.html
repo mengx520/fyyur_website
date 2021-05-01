@@ -53,9 +53,9 @@
         <div class="collapse navbar-collapse">
           <ul class="nav navbar-nav">
             <li>
-              {% if (request.endpoint == 'venues') or
-                (request.endpoint == 'search_venues') or
-                (request.endpoint == 'show_venue') %}
+              {% if (request.endpoint == 'site.venues') or
+                (request.endpoint == 'site.search_venues') or
+                (request.endpoint == 'site.show_venue') %}
               <form class="search" method="post" action="/venues/search">
                 <input class="form-control"
                   type="search"
@@ -64,9 +64,9 @@
                   aria-label="Search">
               </form>
               {% endif %}
-              {% if (request.endpoint == 'artists') or
-                (request.endpoint == 'search_artists') or
-                (request.endpoint == 'show_artist') %}
+              {% if (request.endpoint == 'site.artists') or
+                (request.endpoint == 'site.search_artists') or
+                (request.endpoint == 'site.show_artist') %}
               <form class="search" method="post" action="/artists/search">
                 <input class="form-control"
                   type="search"
@@ -78,9 +78,9 @@
             </li>
           </ul>
           <ul class="nav navbar-nav">
-            <li {% if request.endpoint == 'venues' %} class="active" {% endif %}><a href="{{ url_for('venues') }}">Venues</a></li>
-            <li {% if request.endpoint == 'artists' %} class="active" {% endif %}><a href="{{ url_for('artists') }}">Artists</a></li>
-            <li {% if request.endpoint == 'shows' %} class="active" {% endif %}><a href="{{ url_for('shows') }}">Shows</a></li>
+            <li {% if request.endpoint == 'site.venues' %} class="active" {% endif %}><a href="{{ url_for('site.venues') }}">Venues</a></li>
+            <li {% if request.endpoint == 'site.artists' %} class="active" {% endif %}><a href="{{ url_for('site.artists') }}">Artists</a></li>
+            <li {% if request.endpoint == 'site.shows' %} class="active" {% endif %}><a href="{{ url_for('site.shows') }}">Shows</a></li>
           </ul>
         </div><!--/.nav-collapse -->
       </div>
