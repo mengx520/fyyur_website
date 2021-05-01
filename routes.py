@@ -64,35 +64,39 @@ def search_venues():
 
 @site.route('/venues/<int:venue_id>')
 def show_venue(venue_id):
-    data = Venue.query.filter_by(id = venue_id).first()
-    # query all the available shows 
-    shows = data.shows
-    now = datetime.now()
-    past_shows = []
+     
     upcoming_shows = []
+    past_shows = []
+    now = datetime.now()
+    venue = Venue.query.get(venue_id)
+    # query all the available shows using joins
+    shows = db.session.query(Show.date_time, Show.artist_id, Artist.image_link, Artist.name).\
+        join(Venue, Show.venue_id == Venue.id).\
+        join(Artist, Show.artist_id == Artist.id)
+
     # checking if they are past or future
-    for show in shows:
-        if show.date_time < now:
+    for s in shows:
+        if s.date_time < now:
             past_shows.append({
-                'artist_id': show.artist_id,
-                'artist_image_link': show.artist.image_link,
-                'artist_name': show.artist.name,
-                'start_time': show.date_time.isoformat()
+                'artist_id': s.artist_id,
+                'artist_image_link': s.image_link,
+                'artist_name': s.name,
+                'start_time': s.date_time.isoformat()
             })
         else:
             upcoming_shows.append({
-                'artist_id': show.artist_id,
-                'artist_image_link': show.artist.image_link,
-                'artist_name': show.artist.name,
-                'start_time': show.date_time.isoformat()
+                'artist_id': s.artist_id,
+                'artist_image_link': s.image_link,
+                'artist_name': s.name,
+                'start_time': s.date_time.isoformat()
             })
 
-    data.upcoming_shows = upcoming_shows
-    data.past_shows = past_shows
-    data.upcoming_shows_count = len(upcoming_shows)
-    data.past_shows_count = len(past_shows)
+    venue.upcoming_shows = upcoming_shows
+    venue.past_shows = past_shows
+    venue.upcoming_shows_count = len(upcoming_shows)
+    venue.past_shows_count = len(past_shows)
 
-    return render_template('pages/show_venue.html', venue=data)
+    return render_template('pages/show_venue.html', venue=venue)
 
 #  Create Venue
 #  ----------------------------------------------------------------
@@ -193,34 +197,38 @@ def search_artists():
 
 @site.route('/artists/<int:artist_id>')
 def show_artist(artist_id):
-    data = Artist.query.filter_by(id = artist_id).first()
-
-    shows = data.shows
-    now = datetime.now()
-    past_shows = []
     upcoming_shows = []
+    past_shows = []
+    now = datetime.now()
+    artist = Artist.query.get(artist_id)
+    # query all the available shows using joins
+    shows = db.session.query(Show.date_time, Show.venue_id, Venue.image_link, Venue.name).\
+        join(Venue, Show.venue_id == Venue.id).\
+        join(Artist, Show.artist_id == Artist.id)
 
-    for show in shows:
-        if show.date_time < now:
+    # checking if they are past or future
+    for s in shows:
+        if s.date_time < now:
             past_shows.append({
-              'venue_id': show.venue_id,
-              'venue_image_link': show.venue.image_link,
-              'venue_name': show.venue.name,
-              'start_time': show.date_time.isoformat()
-              })
+                'venue_id': s.venue_id,
+                'venue_image_link': s.image_link,
+                'venue_name': s.name,
+                'start_time': s.date_time.isoformat()
+            })
         else:
             upcoming_shows.append({
-              'venue_id': show.venue_id,
-              'venue_image_link': show.venue.image_link,
-              'venue_name': show.venue.name,
-              'start_time': show.date_time.isoformat()
-              })
-    data.past_shows = past_shows
-    data.upcoming_shows = upcoming_shows
-    data.past_shows_count = len(past_shows)
-    data.upcoming_shows_count = len(upcoming_shows)
+                'venue_id': s.artist_id,
+                'venue_image_link': s.image_link,
+                'venue_name': s.name,
+                'start_time': s.date_time.isoformat()
+            })
 
-    return render_template('pages/show_artist.html', artist=data)
+    artist.upcoming_shows = upcoming_shows
+    artist.past_shows = past_shows
+    artist.upcoming_shows_count = len(upcoming_shows)
+    artist.past_shows_count = len(past_shows)
+
+    return render_template('pages/show_artist.html', artist=artist)
 
 #  Update
 #  ----------------------------------------------------------------
