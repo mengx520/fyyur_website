@@ -4,3 +4,4 @@ flask-moment==0.11.0
 flask-wtf==0.14.3
 flask_sqlalchemy==2.4.4
 Flask-Migrate==2.7.0
+psycopg2==2.8.6
