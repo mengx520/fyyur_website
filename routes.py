@@ -79,7 +79,8 @@ def show_venue(venue_id):
     # query all the available shows using joins
     shows = db.session.query(Show.date_time, Show.artist_id, Artist.image_link, Artist.name).\
         join(Venue, Show.venue_id == Venue.id).\
-        join(Artist, Show.artist_id == Artist.id)
+        join(Artist, Show.artist_id == Artist.id).filter(
+            Show.venue_id == venue_id)
 
     # checking if they are past or future
     for s in shows:
@@ -135,8 +136,7 @@ def create_venue_submission():
                 seeking_talent=form.seeking_talent.data,
                 seeking_description=form.seeking_description.data)
 
-            db.session.add(new_venue)
-            db.session.commit()
+            new_venue.create()
 
             # on successful db insert, flash success
             flash('Venue ' + form.name.data + ' was successfully listed!')
@@ -170,9 +170,8 @@ def delete_venue(venue_id):
         # delete related shows
         shows = Show.query.filter_by(venue_id=venue_id).all()
         for show in shows:
-            db.session.delete(show)
-            db.session.delete(delete_venue)
-            db.session.commit()
+            show.delete()
+        delete_venue.delete()
         print("Venue deleted")
     except:
         db.session.rollback()
@@ -220,7 +219,8 @@ def show_artist(artist_id):
     # query all the available shows using joins
     shows = db.session.query(Show.date_time, Show.venue_id, Venue.image_link, Venue.name).\
         join(Venue, Show.venue_id == Venue.id).\
-        join(Artist, Show.artist_id == Artist.id)
+        join(Artist, Show.artist_id == Artist.id).filter(
+            Show.artist_id == artist_id)
 
     # checking if they are past or future
     for s in shows:
@@ -271,8 +271,7 @@ def edit_artist_submission(artist_id):
         try:
             print(form.genres.data)
             form.populate_obj(artist)
-            db.session.add(artist)
-            db.session.commit()
+            artist.create()
 
             flash('Artist ' + form.name.data + ' was successfully updated!')
             return redirect(url_for('site.show_artist', artist_id=artist.id))
@@ -312,8 +311,7 @@ def edit_venue_submission(venue_id):
         try:
             print(form.genres.data)
             form.populate_obj(venue)
-            db.session.add(venue)
-            db.session.commit()
+            venue.create()
 
             flash('Venue ' + form.name.data + ' was successfully updated!')
             return redirect(url_for('site.show_venue', venue_id=venue.id))
@@ -361,8 +359,8 @@ def create_artist_submission():
                 seeking_venue=form.seeking_venue.data,
                 seeking_description=form.seeking_description.data
             )
-            db.session.add(new_artist)
-            db.session.commit()
+
+            new_artist.create()
 
             # on successful db insert, flash success
             flash('Artist ' + form.name.data + ' was successfully listed!')
@@ -421,8 +419,9 @@ def create_show_submission():
                 artist_id=form.artist_id.data,
                 venue_id=form.venue_id.data,
                 date_time=form.start_time.data)
-            db.session.add(new_show)
-            db.session.commit()
+
+            new_show.create()
+
             # on successful db insert, flash success
             flash('Show was successfully listed!')
             return redirect(url_for('site.shows'))

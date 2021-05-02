@@ -29,6 +29,14 @@ class Venue(db.Model):
     # create one to many relationship one venue can have many shows
     shows = db.relationship('Show', backref='venue')
 
+    def create(self):
+        db.session.add(self)
+        db.session.commit()
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+
 
 class Artist(db.Model):
     __tablename__ = 'artist'
@@ -45,6 +53,14 @@ class Artist(db.Model):
     seeking_venue = db.Column(db.Boolean(), default=False)
     seeking_description = db.Column(db.String(500))
 
+    def create(self):
+        db.session.add(self)
+        db.session.commit()
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+
 
 class Show(db.Model):
     __tablename__ = 'show'
@@ -54,3 +70,11 @@ class Show(db.Model):
     date_time = db.Column(db.DateTime, nullable=False)
     # create relationship between artist and show, one artist to many shows
     artist = db.relationship('Artist', backref='shows')
+
+    def create(self):
+        db.session.add(self)
+        db.session.commit()
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
