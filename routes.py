@@ -128,7 +128,7 @@ def create_venue_submission():
                 city=form.city.data,
                 state=form.state.data,
                 address=form.address.data,
-                phone=form.address.data,
+                phone=form.phone.data,
                 image_link=form.image_link.data,
                 genres=form.genres.data,
                 facebook_link=form.facebook_link.data,
