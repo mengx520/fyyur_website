@@ -6,8 +6,5 @@ class FyyurConfig:
     # Grabs the folder where the script runs.
     basedir = os.path.abspath(os.path.dirname(__file__))
 
-    # Enable debug mode.
-    DEBUG = True
-
     # Connect to the database
-    SQLALCHEMY_DATABASE_URI = 'postgresql://panda:mengxuxu520@localhost:5432/fyyurtest'
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DB_STRING')
