@@ -132,12 +132,12 @@ source venv/bin/activate
 source venv/scripts/activate
 ```
 
-4. **Install the dependencies:**
+2. **Install the dependencies:**
 ```
 pip install -r requirements.txt
 ```
 
-5. **Setup database:**
+3. **Setup database:**
 
 Make sure you are running postgres server, and have created a database.
 
@@ -153,7 +153,7 @@ flask db migrate -m "Initial migration."
 flask db upgrade
 ```
 
-6. **Run the development server:**
+4. **Run the development server:**
 ```
 export FLASK_APP=app
 export FLASK_ENV=development # enables debug mode
@@ -161,6 +161,6 @@ export DB_STRING=postgresql://<user>:<pass>@localhost:5432/<databasename>
 flask run
 ```
 
-7. **Verify on the Browser**<br>
+5. **Verify on the Browser**<br>
 Navigate to project homepage [http://127.0.0.1:5000/](http://127.0.0.1:5000/) or [http://localhost:5000](http://localhost:5000) 
 
