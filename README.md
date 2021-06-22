@@ -122,7 +122,7 @@ Project outcomes:
 
 ## Development Setup
 
-1. **Initialize and activate a virtualenv using:**<br>
+1. **Initialize and activate a virtualenv using:**
 ```
 python -m virtualenv venv
 source venv/bin/activate
@@ -132,12 +132,12 @@ source venv/bin/activate
 source venv/scripts/activate
 ```
 
-2. **Install the dependencies:**<br>
+2. **Install the dependencies:**
 ```
 pip install -r requirements.txt
 ```
 
-3. **Setup database:**<br>
+3. **Setup database:**
 Make sure you are running postgres server, and have created a database.
 ```
 createdb <databasename>
@@ -150,7 +150,7 @@ flask db migrate -m "Initial migration."
 flask db upgrade
 ```
 
-4. **Run the development server:**<br>
+4. **Run the development server:**
 ```
 export FLASK_APP=app
 export FLASK_ENV=development # enables debug mode
@@ -158,6 +158,6 @@ export DB_STRING=postgresql://<user>:<pass>@localhost:5432/<databasename>
 flask run
 ```
 
-5. **Verify on the Browser**<br>
+5. **Verify on the Browser**
 Navigate to project homepage [http://127.0.0.1:5000/](http://127.0.0.1:5000/) or [http://localhost:5000](http://localhost:5000) 
 
