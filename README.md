@@ -138,13 +138,10 @@ pip install -r requirements.txt
 ```
 
 3. **Setup database:**
-
 Make sure you are running postgres server, and have created a database.
-
 ```
 createdb <databasename>
 ```
-
 Populating database schema
 ```
 export DB_STRING=postgresql://<user>:<pass>@localhost:5432/<databasename>
@@ -161,6 +158,6 @@ export DB_STRING=postgresql://<user>:<pass>@localhost:5432/<databasename>
 flask run
 ```
 
-5. **Verify on the Browser**<br>
+5. **Verify on the Browser**
 Navigate to project homepage [http://127.0.0.1:5000/](http://127.0.0.1:5000/) or [http://localhost:5000](http://localhost:5000) 
 
